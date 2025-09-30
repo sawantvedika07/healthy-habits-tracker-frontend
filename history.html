@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - Healthy Habit Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-heartbeat me-2"></i>HealthyHabits
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="history.html">History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="goals.html">Goals</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"><i class="fas fa-user-circle"></i> Profile</a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="profile.html">Edit Profile</a></li>
+                            <li><a class="dropdown-item" href="forgot-password.html">Forgot Password</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="logoutBtn">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container my-4">
+        <div class="dashboard-card p-4">
+            <h2 class="mb-4"><i class="fas fa-history me-2"></i> Habit History & Streak Log</h2>
+            <p class="text-muted mb-4">View your progress, completion rates, and historical data. **We've added a streak log to celebrate consistency!**</p>
+            
+            <ul class="nav nav-tabs mb-4" id="historyTabs" role="tablist">
+                <li class="nav-item"><button class="nav-link active" id="water-tab" data-bs-toggle="tab" data-bs-target="#water-history" type="button">Water</button></li>
+                <li class="nav-item"><button class="nav-link" id="steps-tab" data-bs-toggle="tab" data-bs-target="#steps-history" type="button">Steps</button></li>
+                <li class="nav-item"><button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-history" type="button">All Habits</button></li>
+            </ul>
+            
+            <div class="tab-content" id="historyTabContent">
+                <div class="tab-pane fade show active" id="water-history" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Detailed Log</h5>
+                            <table class="table table-sm table-striped">
+                                <thead><tr><th>Date</th><th>Amount (L)</th><th>Entries</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Today</td><td>1.8</td><td>4 times</td></tr>
+                                    <tr><td>Yesterday</td><td>2.5</td><td>5 times</td></tr>
+                                    <tr><td>2 days ago</td><td>2.1</td><td>4 times</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Completion Streak</h5>
+                            <div class="alert alert-success">
+                                **Water Streak: 5 days!** Keep up the great work.
+                            </div>
+                            <div class="chart-container"><canvas id="waterHistoryChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="steps-history" role="tabpanel">
+                    <h5>Steps Log (Last Week)</h5>
+                    <table class="table table-sm table-striped">
+                        <thead><tr><th>Date</th><th>Steps</th><th>Goal Met</th></tr></thead>
+                        <tbody>
+                            <tr><td>Today</td><td>7,542</td><td>No</td></tr>
+                            <tr><td>Yesterday</td><td>10,345</td><td>Yes</td></tr>
+                            <tr><td>2 days ago</td><td>9,200</td><td>No</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="tab-pane fade" id="all-history" role="tabpanel">
+                    <h5>All Recorded Activities (Sample)</h5>
+                    <table class="table table-sm table-hover">
+                        <thead><tr><th>Date</th><th>Habit</th><th>Value</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr><td>2024-10-25</td><td>Water Intake</td><td>500ml</td><td><span class="badge bg-info">Logged</span></td></tr>
+                            <tr><td>2024-10-25</td><td>Step Count</td><td>7,542 steps</td><td><span class="badge bg-warning">In Progress</span></td></tr>
+                            <tr><td>2024-10-24</td><td>Sleep Tracking</td><td>8.2 hours</td><td><span class="badge bg-success">Completed</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="script.js"></script> </body>
+</html>

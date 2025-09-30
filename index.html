@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthy Habit Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --secondary: #2196F3;
+            --accent: #FF9800;
+            --light: #f8f9fa;
+            --dark: #343a40;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7f9;
+            color: #333;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .dashboard-card {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            background: white;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+        }
+        
+        .progress-bar{
+            /* Styles specific to the filled part of the bar */
+            transition: width 0.6s ease; /* For a smooth animation */
+        }
+
+        #daily-completion-bar {
+            width: 75%;
+            background-color: var(--primary); /* A nice green color */
+        }
+
+        .habit-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .water-icon {
+            background-color: rgba(33, 150, 243, 0.2);
+            color: var(--secondary);
+        }
+        
+        .steps-icon {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--primary);
+        }
+        
+        .weight-icon {
+            background-color: rgba(255, 152, 0, 0.2);
+            color: var(--accent);
+        }
+        
+        .sleep-icon {
+            background-color: rgba(156, 39, 176, 0.2);
+            color: #9C27B0;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #3d8b40;
+            border-color: #3d8b40;
+        }
+        
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+        
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .stats-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .add-habit-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        @media (max-width: 768px) {
+            .stats-number {
+                font-size: 1.5rem;
+            }
+        }
+        /* Smooth fill animation for progress bars */
+       .progress-bar {
+        width: 0; /* start empty */
+        transition: width 1.5s ease-in-out;
+        }
+        </style>
+</head>
+<body>    
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-heartbeat me-2"></i>HealthyHabits
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="history.html">History</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Goals</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- Main Content -->
+    <div class="container my-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-lg-3 mb-4">
+                <div class="dashboard-card p-3 mb-3">
+                    <h5 class="mb-3">Daily Summary</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Completion</span>
+                        <span class="fw-bold">75%</span>
+                        <div class="progress mb-3">
+                          <div id="daily-completion-bar" class="progress-bar bg-success" style="width:75%"></div>
+                        </div>
+                    </div>
+                    <div class="progress mb-3">
+                        <div class="progress-bar" data-value="75%"></div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Current Streak</span>
+                        <span class="fw-bold">12 days</span>
+                    </div>
+                </div>
+                
+                <div class="dashboard-card p-3">
+                    <h5 class="mb-3">Quick Stats</h5>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="habit-icon water-icon">
+                            <i class="fas fa-tint"></i>
+                        </div>
+                        <div>
+                            <div class="stats-number">1.8L</div>
+                            <div class="stats-label">Water Today</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="habit-icon steps-icon">
+                            <i class="fas fa-walking"></i>
+                        </div>
+                        <div>
+                            <div class="stats-number">7,542</div>
+                            <div class="stats-label">Steps Today</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="habit-icon weight-icon">
+                            <i class="fas fa-weight"></i>
+                        </div>
+                        <div>
+                            <div class="stats-number">68.5kg</div>
+                            <div class="stats-label">Current Weight</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Dashboard -->
+            <div class="col-lg-9">
+                <div class="dashboard-card p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">Today's Habits</h4>
+                        <div class="text-muted">Wednesday, Sept 24</div>
+                    </div>
+                    
+                    <!-- Water Intake Card -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="habit-icon water-icon">
+                                    <i class="fas fa-tint"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-1">Water Intake</h5>
+                                    <p class="card-text text-muted mb-2">Goal: 2.5L</p>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar" style="width: 72%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small>1.8L / 2.5L</small>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#waterModal">
+                                                <i class="fas fa-plus"></i> Add
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-history"></i> History
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Steps Card -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="habit-icon steps-icon">
+                                    <i class="fas fa-walking"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-1">Step Count</h5>
+                                    <p class="card-text text-muted mb-2">Goal: 10,000 steps</p>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-success" style="width: 75%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small>7,542 / 10,000 steps</small>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#stepsModal">
+                                                <i class="fas fa-edit"></i> Update
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-history"></i> History
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Weight Card -->
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="habit-icon weight-icon">
+                                    <i class="fas fa-weight"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-1">Weight Tracking</h5>
+                                    <p class="card-text text-muted mb-2">Current: 68.5kg | Goal: 65kg</p>
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="flex-grow-1">
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar bg-warning" style="width: 70%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="ms-2 small text-muted">-3.5kg</div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small>Last updated: Oct 15</small>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#weightModal">
+                                                <i class="fas fa-edit"></i> Update
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-chart-line"></i> Progress
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sleep Card -->
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="habit-icon sleep-icon">
+                                    <i class="fas fa-bed"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h5 class="card-title mb-1">Sleep Tracking</h5>
+                                    <p class="card-text text-muted mb-2">Goal: 8 hours</p>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-info" style="width: 88%"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <small>7 hours / 8 hours</small>
+                                        <div>
+                                            <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#sleepModal">
+                                                <i class="fas fa-edit"></i> Update
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-history"></i> History
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Progress Charts -->
+                <div class="dashboard-card p-4">
+                    <h4 class="mb-4">Weekly Progress</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <div class="chart-container">
+                                <canvas id="waterChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="chart-container">
+                                <canvas id="stepsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Habit Button -->
+    <a href="#" class="add-habit-btn btn btn-primary" data-bs-toggle="modal" data-bs-target="#addHabitModal">
+        <i class="fas fa-plus"></i>
+    </a>
+
+    <!-- Water Modal -->
+    <div class="modal fade" id="waterModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Log Water Intake</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Amount (ml)</label>
+                        <input type="number" class="form-control" placeholder="Enter amount in ml">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Time</label>
+                        <input type="time" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Steps Modal -->
+    <div class="modal fade" id="stepsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update Step Count</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Steps Today</label>
+                        <input type="number" class="form-control" value="7542">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weight Modal -->
+    <div class="modal fade" id="weightModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Log Weight</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Weight (kg)</label>
+                        <input type="number" step="0.1" class="form-control" placeholder="Enter your weight">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Habit Modal -->
+    <div class="modal fade" id="addHabitModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Habit</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Habit Name</label>
+                        <input type="text" class="form-control" placeholder="e.g., Meditation, Reading, etc.">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <select class="form-select">
+                           <option value="">Select Category</option>
+                            <option value="health">Health & Fitness</option>
+                            <option value="mental">Mental Wellbeing</option>
+                            <option value="nutrition">Nutrition</option>
+                            <option value="productivity">Productivity</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Goal</label>
+                        <input type="text" class="form-control" placeholder="e.g., 20 minutes daily">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addNewHabit()">Add Habit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sleep Modal -->
+    <div class="modal fade" id="sleepModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Log Sleep</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Sleep Duration (hours)</label>
+                        <input type="number" step="0.5" class="form-control" placeholder="e.g., 7.5">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sleep Time</label>
+                        <input type="time" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Wake Time</label>
+                        <input type="time" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="logSleep()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal (Basic - Expand for Full Profile Editing) -->
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">User  Profile</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-4">
+                            <div class="habit-icon water-icon mx-auto mb-3" style="width: 80px; height: 80px;">
+                                <i class="fas fa-user fa-2x"></i>
+                            </div>
+                            <h5 id="profileName">Ruhi Sharma</h5>
+                            <p class="text-muted" id="profileEmail">ruhi@example.com</p>
+                            <p class="text-muted small">Member since: Oct 2023</p>
+                        </div>
+                        <div class="col-md-8">
+                            <form id="profileForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="editName" value="John Doe">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="editEmail" value="john@example.com">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Height (cm)</label>
+                                    <input type="number" class="form-control" placeholder="e.g., 175">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Weight Goal (kg)</label>
+                                    <input type="number" step="0.1" class="form-control" placeholder="e.g., 65">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Daily Water Goal (L)</label>
+                                    <input type="number" step="0.1" class="form-control" value="2.5">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="updateProfile()">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- jQuery (Optional - for easier DOM manipulation if needed) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <script>
+        // Global variables for charts
+        let waterChart, stepsChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            setupModalHandlers();
+            setupNavigation();
+
+            //Animate progress bars
+            document.querySelectorAll('.progress-bar').forEach(
+             bar{
+                constvalue =bar.style.width = value + '%'
+              });
+        });
+
+        function initializeCharts() {
+            // Water Chart (Bar Chart)
+            const waterCtx = document.getElementById('waterChart').getContext('2d');
+            waterChart = new Chart(waterCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Water (L)',
+                        data: [2.1, 2.3, 1.8, 2.4, 2.0, 1.7, 2.2],
+                        backgroundColor: 'rgba(33, 150, 243, 0.5)',
+                        borderColor: 'rgba(33, 150, 243, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Liters' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+
+            // Steps Chart (Line Chart)
+            const stepsCtx = document.getElementById('stepsChart').getContext('2d');
+            stepsChart = new Chart(stepsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Steps',
+                        data: [8234, 9456, 7542, 10234, 8765, 5678, 9876],
+                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                        borderColor: 'rgba(76, 175, 80, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Steps' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function setupModalHandlers() {
+            // Generic handler for save buttons in modals
+            document.querySelectorAll('.modal-footer .btn-primary').forEach(button => {
+                button.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    const modalId = modal ? modal.id : '';
+                    saveModalData(modalId);
+                    // Close modal
+                    const bsModal = bootstrap.Modal.getInstance(modal);
+                    if (bsModal) bsModal.hide();
+                });
+            });
+
+            // Add Habit specific handler
+            document.querySelector('#addHabitModal .btn-primary').addEventListener('click', addNewHabit);
+        }
+
+        function setupNavigation() {
+            // Profile link opens modal
+            document.querySelector('a[href="#"]').closest('li').querySelector('a').addEventListener('click', function(e) {
+                e.preventDefault();
+                const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+                profileModal.show();
+            });
+        }
+
+        function saveModalData(modalId) {
+            let data = {};
+            switch (modalId) {
+                case 'waterModal':
+                    const waterAmount = document.querySelector('#waterModal input[type="number"]').value;
+                    const waterTime = document.querySelector('#waterModal input[type="time"]').value;
+                    data = { type: 'water', amount: waterAmount, time: waterTime };
+                    // Simulate API call to Java backend
+                    console.log('Saving water data:', data);
+                    // Example: fetch('/api/habits/water', { method: 'POST', body: JSON.stringify(data) });
+                    alert('Water intake logged! (Connect to Java backend for real save)');
+                    updateWaterProgress(parseFloat(waterAmount) / 1000); // Update UI
+                    break;
+                case 'stepsModal':
+                    const stepsValue = document.querySelector('#stepsModal input[type="number"]').value;
+                    data = { type: 'steps', steps: stepsValue };
+                    console.log('Saving steps data:', data);
+                    alert('Steps updated! (Connect to Java backend for real save)');
+                    updateStepsProgress(parseInt(stepsValue));
+                    break;
+                case 'weightModal':
+                    const weightValue = document.querySelector('#weightModal input[type="number"]').value;
+                    const weightDate = document.querySelector('#weightModal input[type="date"]').value;
+                    data = { type: 'weight', weight: weightValue, date: weightDate };
+                    console.log('Saving weight data:', data);
+                    alert('Weight logged! (Connect to Java backend for real save)');
+                    updateWeightProgress(parseFloat(weightValue));
+                    break;
+                case 'sleepModal':
+                    const sleepHours = document.querySelector('#sleepModal input[step="0.5"]').value;
+                    data = { type: 'sleep', hours: sleepHours };
+                    console.log('Saving sleep data:', data);
+                    alert('Sleep logged! (Connect to Java backend for real save)');
+                    updateSleepProgress(parseFloat(sleepHours));
+                    break;
+                default:
+                    console.log('Unknown modal:', modalId);
+            }
+        }
+
+        function addNewHabit() {
+            const habitName = document.querySelector('#addHabitModal input[type="text"]').value;
+            const category = document.querySelector('#addHabitModal select').value;
+            const goal = document.querySelector('#addHabitModal input[placeholder*="minutes"]').value;
+            if (!habitName || !category || !goal) {
+                alert('Please fill all fields');
+                return;
+            }
+            console.log('Adding habit:', { name: habitName, category, goal });
+            alert('New habit added! (Connect to Java backend for real save)');
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addHabitModal'));
+            if (modal) modal.hide();
+            // Clear form
+            document.querySelector('#addHabitModal input[type="text"]').value = '';
+            document.querySelector('#addHabitModal select').value = '';
+            document.querySelector('#addHabitModal input[placeholder*="minutes"]').value = '';
+        }
+
+        function updateProfile() {
+            const name = document.getElementById('editName').value;
+            const email = document.getElementById('editEmail').value;
+            console.log('Updating profile:', { name, email });
+            alert('Profile updated! (Connect to Java backend for real save)');
+            document.getElementById('profileName').textContent = name;
+            document.getElementById('profileEmail').textContent = email;
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('profileModal'));
+            if (modal) modal.hide();
+        }
+
+        // Helper functions to update UI progress (simulate data from backend)
+        function updateWaterProgress(liters) {
+            const totalGoal = 2.5;
+            const progress = (liters / totalGoal) * 100;
+            document.querySelector('.progress-bar[style*="72%"]').style.width = `${Math.min(progress, 100)}%`;
+            document.querySelector('small:contains("1.8L")').textContent = `${liters.toFixed(1)}L / ${totalGoal}L`;
+            document.querySelector('.stats-number:contains("1.8L")').textContent = `${liters.toFixed(1)}L`;
+            // Update chart data (example)
+            waterChart.data.datasets[0].data[2] = liters; // Update today's data
+            waterChart.update();
+        }
+
+        function updateStepsProgress(steps) {
+            const totalGoal = 10000;
+            const progress = (steps / totalGoal) * 100;
+            document.querySelector('.progress-bar[style*="75%"]').style.width = `${Math.min(progress, 100)}%`;
+            document.querySelector('small:contains("7,542")').textContent = `${steps.toLocaleString()} / ${totalGoal.toLocaleString()} steps`;
+            document.querySelector('.stats-number:contains("7,542")').textContent = steps.toLocaleString();
+            stepsChart.data.datasets[0].data[2] = steps;
+            stepsChart.update();
+        }
+
+        function updateWeightProgress(weight) {
+            // Simple update - calculate progress toward goal (e.g., 65kg)
+            const goal = 65;
+            const progress = ((weight - goal) / goal) * 100; // Example logic
+            document.querySelector('.progress-bar[style*="70%"]').style.width = `${Math.abs(Math.min(progress, 100))}%`;
+            document.querySelector('.stats-number:contains("68.5kg")').textContent = `${weight}kg`;
+            document.getElementById('weightLastUpdate').textContent = `Last updated: ${new Date().toLocaleDateString()}`;
+        }
+
+        function updateSleepProgress(hours) {
+            const totalGoal = 8;
+            const progress = (hours / totalGoal) * 100;
+            document.querySelector('.progress-bar[style*="88%"]').style.width = `${Math.min(progress, 100)}%`;
+            document.querySelector('small:contains("7 hours")').textContent = `${hours} hours / ${totalGoal} hours`;
+        }
+
+        function logSleep() {
+            const hours = parseFloat(document.querySelector('#sleepModal input[step="0.5"]').value);
+            if (!hours) {
+                alert('Please enter sleep duration');
+                return;
+            }
+            saveModalData('sleepModal');
+        }
+
+        // Optional: jQuery for additional enhancements (if using jQuery)
+        if (typeof jQuery !== 'undefined') {
+            $(document).ready(function() {
+                // Example: Animate progress bars on load
+                $('.progress-bar').each(function() {
+                    $(this).css('width', '0%').animate({ width: $(this).attr('style').match(/width:\s*(\d+)%/)[1] + '%' }, 1000);
+                });
+            });
+        }
+        <!-- History Section (Hidden by default) -->
+<div id="historySection" class="container my-4" style="display: none;">
+    <div class="dashboard-card p-4">
+        <h2 class="mb-4">Habit History</h2>
+        <p class="text-muted mb-4">View your progress over the last 30 days. Select a habit to see details.</p>
+        
+        
+        <ul class="nav nav-tabs mb-4" id="historyTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="water-tab" data-bs-toggle="tab" data-bs-target="#water-history" type="button" role="tab">Water</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="steps-tab" data-bs-toggle="tab" data-bs-target="#steps-history" type="button" role="tab">Steps</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="weight-tab" data-bs-toggle="tab" data-bs-target="#weight-history" type="button" role="tab">Weight</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="sleep-tab" data-bs-toggle="tab" data-bs-target="#sleep-history" type="button" role="tab">Sleep</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-history" type="button" role="tab">All Habits</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content" id="historyTabContent">
+            
+            <div class="tab-pane fade show active" id="water-history" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Water Intake Log (Last 30 Days)</h5>
+                        <table class="table table-sm table-striped" id="waterTable">
+                            <thead><tr><th>Date</th><th>Total (L)</th><th>Entries</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="waterHistoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="tab-pane fade" id="steps-history" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Steps Log (Last 30 Days)</h5>
+                        <table class="table table-sm table-striped" id="stepsTable">
+                            <thead><tr><th>Date</th><th>Steps</th><th>Notes</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="stepsHistoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+            <div class="tab-pane fade" id="weight-history" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Weight Log (Last 30 Days)</h5>
+                        <table class="table table-sm table-striped" id="weightTable">
+                            <thead><tr><th>Date</th><th>Weight (kg)</th><th>Notes</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="weightHistoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            <div class="tab-pane fade" id="sleep-history" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Sleep Log (Last 30 Days)</h5>
+                        <table class="table table-sm table-striped" id="sleepTable">
+                            <thead><tr><th>Date</th><th>Hours</th><th>Sleep-Wake</th></tr></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="sleepHistoryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+           
+            <div class="tab-pane fade" id="all-history" role="tabpanel">
+                <h5>All Habits Log (Last 30 Days)</h5>
+                <table class="table table-sm table-striped" id="allHabitsTable">
+                    <thead><tr><th>Date</th><th>Habit</th><th>Category</th><th>Value</th><th>Completed</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+    </script>
+</body>
+</html>
